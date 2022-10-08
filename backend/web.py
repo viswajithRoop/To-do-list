@@ -26,7 +26,15 @@ class Users(db.Model):
     name = db.Column(db.String)
     email = db.Column(db.String)
     password = db.Column(db.Integer)
+    todolists = db.relationship("Todolist", back_populates = "user")
 
+class Todolist(db.Model):
+    __tablename__ = "todolist"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    privacy = db.Column(db.String)
+    user = db.relationship("Users", back_populates="todolists")
 
 def auth_middleware():
     def token_required(f):
@@ -61,7 +69,7 @@ def auth_middleware():
             return f(current_user, *args, **kwargs)
 
         return decorated
-    return token_required@app.route('/login', methods=['POST'])
+    return token_required
 
 
 @app.route('/register', methods=['POST'])
@@ -109,3 +117,20 @@ def login():
                         "data": {"username":user.name,
                                  "user_id": user.id}}), 200
     return jsonify({"error": "Password is incorrect"}), 401
+
+@app.route('/todolist', methods=['POST'])
+@auth_middleware()
+def addtodolist(current_user):
+    name = request.json['name']
+    privacy = request.json['privacy']
+    todolist = Todolist(name=name.upper(), user_id=current_user.id, privacy=privacy)
+    todolists = Todolist.query.filter_by(
+        name=name.upper(), user_id=current_user.id, privacy = privacy).first()
+    if (todolists):
+        return jsonify({"error": "Todo List already exists"}), 409
+    else:
+        db.session.add(todolist)
+        db.session.commit()
+        return jsonify({"message": "Todo List Added",
+                         "data": {"username": current_user.name,
+                                   "name" : todolist.name}}), 200
