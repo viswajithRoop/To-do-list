@@ -164,3 +164,15 @@ def addtodoitem(current_user):
         db.session.add(task)
         db.session.commit()
         return jsonify({"message": "Task added"}), 200
+
+@app.route('/guest', methods=['GET'])
+def guest():
+    todolists = Todolist.query.filter_by(privacy="public").all()
+    public_todolists = []
+    for todolist in todolists:
+        tasks = []
+        for task in todolist.tasks:
+            tasks.append(task.name)
+        public_todolists.append(
+            dict(name=todolist.name, username=todolist.user.name, tasks=tasks, id=todolist.id))
+    return jsonify(dict(public=public_todolists))
