@@ -29,12 +29,23 @@ class Users(db.Model):
     todolists = db.relationship("Todolist", back_populates = "user")
 
 class Todolist(db.Model):
-    __tablename__ = "todolist"
+    __tablename__ = "todolists"
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
     privacy = db.Column(db.String)
     user = db.relationship("Users", back_populates="todolists")
+    tasks = db.relationship("Task", back_populates = "todolist")
+
+class Task(db.Model):
+    __tablename__ = "tasks"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    date = db.Column(db.Date)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    todolist_id = db.Column(db.Integer, db.ForeignKey("todolists.id"), nullable=False)
+    status = db.Column(db.String, default="on progress")
+    todolist = db.relationship("Todolist", back_populates="tasks")
 
 def auth_middleware():
     def token_required(f):
@@ -134,3 +145,22 @@ def addtodolist(current_user):
         return jsonify({"message": "Todo List Added",
                          "data": {"username": current_user.name,
                                    "name" : todolist.name}}), 200
+
+@app.route('/task', methods=['POST'])
+@auth_middleware()
+def addtodoitem(current_user):
+    id = request.json['id']
+    name = request.json['name']
+    date = request.json['date']
+    formated_date = datetime.strptime(date, '%Y-%m-%d')
+    task = Task(name=name, date=date, user_id=current_user.id, todolist_id=id)
+    task_exist = Task.query.filter_by(
+        name=name, user_id=current_user.id, todolist_id=id, date=formated_date).first()
+    if (task_exist):
+        return jsonify({"error": "Task already exists"}), 409
+    elif (formated_date+timedelta(days=1) < datetime.today()):
+        return jsonify({"error": "invalid date"}), 422
+    else:
+        db.session.add(task)
+        db.session.commit()
+        return jsonify({"message": "Task added"}), 200
