@@ -51,7 +51,10 @@ const Login = () => {
                 if (resp && resp.status){
                     localStorage.setItem("accessToken", resp?.data?.accessToken);
                     const userName = resp?.data?.data?.username
-                    swal({ text: resp.data.message, icon: "success", closeModal: true })
+                    swal({ text: resp.data.message, icon: "success", closeModal: true }).then(() => navigate(`/users/${userName}/`));
+                }
+                else {
+                    navigate('/')
                 }
             }).catch((e) => {
                 if (e.response.status === 401){
