@@ -23,6 +23,17 @@ class Todolist(Base):
     name = Column(String)
     user_id = Column(Integer, ForeignKey("users.id"), nullable= False)
     privacy = Column(String)
-    user = relationship("Uses", back_populates = "todolists")
+    user = relationship("Users", back_populates = "todolists")
+    tasks = relationship("Task", back_populates = "todolist")
+
+class Task(Base):
+    __tablename__ = "tasks"
+    id = Column(Integer, primary_key = True)
+    name = Column(String)
+    date = Column(Date)
+    user_id = Column(Integer, ForeignKey("users.id"),nullable=False)
+    todolist_id = Column(Integer, ForeignKey("todolists.id"), nullable=False)
+    status = Column(String)
+    todolist = relationship("Todolist", back_populates = "tasks")
 
 Base.metadata.create_all(engine)
