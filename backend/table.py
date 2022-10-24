@@ -18,7 +18,7 @@ class Users(Base):
     todolists = relationship("Todolist", back_populates = "user")
 
 class Todolist(Base):
-    __tablename__= "todolist"
+    __tablename__= "todolists"
     id = Column(Integer, primary_key = True)
     name = Column(String)
     user_id = Column(Integer, ForeignKey("users.id"), nullable= False)
