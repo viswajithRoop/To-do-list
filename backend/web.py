@@ -187,3 +187,27 @@ def viewtodolist(current_user):
         todolists.append(dict(username = current_user.name,name=todolist.name,  user_id=todolist.user_id,
                          privacy=todolist.privacy, id=todolist.id))
     return jsonify(dict(todolists=todolists))
+
+
+@app.route('/currentuser', methods=['GET'])
+@auth_middleware()
+def currentuser(current_user):
+    return jsonify({"user_name": current_user.name,
+                    "user_id":current_user.id})
+
+@app.route('/task', methods=['GET'])
+@auth_middleware()
+def viewtodoitem(current_user):
+    id = request.args['id']
+    tasks = Task.query.filter_by(todolist_id=id)
+    task_exist = []
+    for task in tasks:
+        if (task.date < date.today() and task.status != "Finished"):
+            task.status = "Pending"
+            db.session.commit()
+            task_exist.append(dict(name=task.name, date=task.date,status=task.status, todolist_id=task.todolist_id, id=task.id))
+        else:
+            task_exist.append(dict(name=task.name, date=task.date,status=task.status, todolist_id=task.todolist_id, id=task.id))
+    sorted_task = (
+        sorted(task_exist, key=operator.itemgetter('status'), reverse=True))
+    return jsonify(dict(sorted_task=sorted_task))
