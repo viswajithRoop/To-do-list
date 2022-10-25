@@ -211,3 +211,12 @@ def viewtodoitem(current_user):
     sorted_task = (
         sorted(task_exist, key=operator.itemgetter('status'), reverse=True))
     return jsonify(dict(sorted_task=sorted_task))
+
+@app.route('/todolist', methods=['DELETE'])
+@auth_middleware()
+def deletetodolist(current_user):
+    id = request.json['id']
+    todolist = Todolist.query.get(id)
+    db.session.delete(todolist)
+    db.session.commit()
+    return jsonify({"status": True})
