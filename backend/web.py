@@ -176,3 +176,14 @@ def guest():
         public_todolists.append(
             dict(name=todolist.name, username=todolist.user.name, tasks=tasks, id=todolist.id))
     return jsonify(dict(public=public_todolists))
+
+
+@app.route('/todolist', methods=['GET'])
+@auth_middleware()
+def viewtodolist(current_user):
+    user_todolist = current_user.todolists
+    todolists = []
+    for todolist in user_todolist:
+        todolists.append(dict(username = current_user.name,name=todolist.name,  user_id=todolist.user_id,
+                         privacy=todolist.privacy, id=todolist.id))
+    return jsonify(dict(todolists=todolists))
