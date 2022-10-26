@@ -229,3 +229,12 @@ def deletetask(current_user):
     db.session.delete(task)
     db.session.commit()
     return jsonify({"status": True})
+
+@app.route('/task', methods=['PATCH'])
+@auth_middleware()
+def finishedtask(current_user):
+    id = request.json['id']
+    task_finished = Task.query.filter_by(id=id).first()
+    task_finished.status = "Finished"
+    db.session.commit()
+    return jsonify({"status": True})
