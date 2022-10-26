@@ -220,3 +220,12 @@ def deletetodolist(current_user):
     db.session.delete(todolist)
     db.session.commit()
     return jsonify({"status": True})
+
+@app.route('/task', methods=['Delete'])
+@auth_middleware()
+def deletetask(current_user):
+    id = request.json['id']
+    task = Task.query.get(id)
+    db.session.delete(task)
+    db.session.commit()
+    return jsonify({"status": True})
