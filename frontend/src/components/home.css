@@ -7,7 +7,7 @@
   .todolist-quotes {
     font-feature-settings: "smcp";
     font-variant: small-caps;
-    color: #484646;
+    color: hsl(219, 52%, 31%);
     margin: 10px;
   
   }
