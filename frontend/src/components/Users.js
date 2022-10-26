@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import '../index.css';
+import './users.css'
 import AddIcon from '@mui/icons-material/Add';
 import Modal from 'react-modal';
 import AddTodoList from "./AddTodoList";
@@ -44,7 +45,20 @@ const customStyles = {
 
 const User = () => {
     const navigate = useNavigate()
-
+    useEffect(() => {
+        axios({
+            method: 'get',
+            url: 'http://127.0.0.1:5000/currentuser',
+            headers: {
+                Authorization: "Bearer " + localStorage.getItem("accessToken")
+            }
+        }).then(resp => {
+            setUser(
+                resp.data.user_name
+            )
+        })
+    }, [])
+    const [user, setUser] = useState([])
 
     const getTodoList = () => {
         axios({
@@ -64,8 +78,37 @@ const User = () => {
     useEffect(() => {
         getTodoList()
     }, [])
+    const listDeleteWarning = (id, name) => {
+        swal({
+            title: "Are you sure?",
+            text: `You want to delete ${name} todolist`,
+            icon: "warning",
+            buttons: true,
+            dangerMode: true,
+        })
+            .then((willDelete) => {
+                if (willDelete) {
+                    listdeleteClick(id)
+                    getTodoList()
+                }
+            });
+    }
 
-
+    const listdeleteClick = (id) => {
+        axios({
+            method: 'DELETE',
+            url: `http://127.0.0.1:5000/todolist`,
+            data: { id },
+            headers: {
+                Authorization: "Bearer " + localStorage.getItem("accessToken")
+            }
+        }).then(resp => {
+            if (resp.data.status = true) {
+                getTodoList()
+                window.location.reload()
+            }
+        })
+    }
 
     const [modalIsOpen, setModalIsOpen] = useState(false)
     const closeModal = () => (
@@ -124,7 +167,10 @@ const User = () => {
                                     <tr key={key}>
                                         <td><Link to={`/users/${item.username}/todolists/${item.name}`}><button className={item.id == content.id ? "selected-todolist" : "todolist-name"} onClick={() => setContent(item)} >{item.name}</button></Link></td>
                                         <td><label className={item.privacy == "private" ? "todolist-privacy-private" : "todolist-privacy-public"} >{item.privacy}</label></td>
-
+                                        <button className="delete-btn" onClick={() => {
+                                            listDeleteWarning((item.id), (item.name))
+                                            navigate(`/users/${user}`)
+                                        }}><DeleteForeverIcon sx={{ color: red[800] }} /></button>
                                     </tr>
                                 )
                             })}
