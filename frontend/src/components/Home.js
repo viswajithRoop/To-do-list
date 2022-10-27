@@ -14,7 +14,7 @@ const Home = () => {
     <MDBContainer fluid className='p-4 background-radial-gradient overflow-hidden home-maindiv'>
       <MDBRow>
         <MDBCol md='6' className='text-center text-md-start d-flex flex-column justify-content-center'>
-          <h1 className="my-5 display-3 fw-bold ls-tight px-3 home-heading" style={{ color: 'hsl(219, 55%, 27%)' }}>
+          <h1 className="my-5 display-3 fw-bold ls-tight px-3 home-heading" style={{ color: 'rgb(255, 255, 255)' }}>
             To Do List <br />
             <span style={{ color: 'hsl(218, 81%, 75%)' }}></span>
           </h1>
@@ -25,16 +25,12 @@ const Home = () => {
           </p>
         </MDBCol>
         <MDBRow>
-          <MDBCol></MDBCol>
-          <MDBCol md='4'>
             <div className='signup-login-div'>
-              <center>
                 <MDBBtn className='signup-button'><a href='/register' className='signuplink'>SignUp</a></MDBBtn>
                 <MDBBtn className='signup-button'><a href='/login' className='signuplink'>LogIn</a></MDBBtn>
+                <br/>
                 <MDBBtn className='signup-guestbutton'><a href='/guest' className='signuplink'>SignIn as a Guest</a></MDBBtn>
-              </center>
             </div>
-          </MDBCol>
         </MDBRow>
       </MDBRow>
     </MDBContainer>
